@@ -12,7 +12,7 @@ FORCE_JOIN_CHANNEL = os.getenv("FORCE_JOIN_CHANNEL")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
---- Dummy Web Server for Render ---
+# --- Dummy Web Server for Render ---
 
 async def handle(request): return web.Response(text="Bot is running!")
 
