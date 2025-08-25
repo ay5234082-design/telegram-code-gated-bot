@@ -27,8 +27,8 @@ class FileAccessBot:
     def __init__(self, bot_token: str, owner_id: int, backup_channel_id: str):
         logger.info(f"Initializing bot with owner_id: {owner_id}, channel: {backup_channel_id}")
         self.BOT_TOKEN = os.getenv("7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA")
-        self.owner_id = 5045767844
-        self.backup_channel_id = @newupji
+        self.owner_id = os.getenv("5045767844")
+        self.backup_channel_id = os.getenv("@newupji")
         self.db_path = "file_bot.db"
         logger.info("Initializing database...")
         self.init_database()
