@@ -5,7 +5,9 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart
 from aiohttp import web
 
-BOT_TOKEN = os.getenv("7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA") OWNER_ID = int(os.getenv("5045767844", "0")) FORCE_JOIN_CHANNEL = os.getenv("@newupji")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+OWNER_ID = int(os.getenv("OWNER_ID", "0"))
+FORCE_JOIN_CHANNEL = os.getenv("FORCE_JOIN_CHANNEL")
 
 bot = Bot(token=BOT_TOKEN) dp = Dispatcher()
 
