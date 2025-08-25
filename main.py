@@ -26,9 +26,9 @@ logger = logging.getLogger(__name__)
 class FileAccessBot:
     def __init__(self):
         # Load configuration from environment variables
-        self.bot_token = os.environ.get("BOT_TOKEN")
-        self.owner_id = int(os.environ.get("OWNER_ID", "0"))
-        self.backup_channel_id = os.environ.get("BACKUP_CHANNEL_ID", "")
+        self.bot_token = os.environ.get("7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA")
+        self.owner_id = int(os.environ.get("5045767844", "0"))
+        self.backup_channel_id = os.environ.get("-1003099354644", "")
         self.db_path = "file_bot.db"
         self.init_database()
         
