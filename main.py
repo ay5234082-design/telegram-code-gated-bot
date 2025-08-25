@@ -495,4 +495,4 @@ Need help? Contact the bot owner!
             application.add_handler(CommandHandler("start", self.start_command))
             application.add_handler(CommandHandler("help", self.help_command))
             application.add_handler(CommandHandler("upload", self.upload_command))
-            application.add_handler(CommandHandler("check_users", self.check_users_co
+            application.add_handler(CommandHandler("check_users", self.check_users_command))
