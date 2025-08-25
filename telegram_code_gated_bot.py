@@ -1,4 +1,9 @@
-import os import asyncio from aiogram import Bot, Dispatcher from aiogram.types import Message from aiogram.filters import CommandStart from aiohttp import web
+import os
+import asyncio
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
+from aiogram.filters import CommandStart
+from aiohttp import web
 
 BOT_TOKEN = os.getenv("7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA") OWNER_ID = int(os.getenv("5045767844", "0")) FORCE_JOIN_CHANNEL = os.getenv("@newupji")
 
