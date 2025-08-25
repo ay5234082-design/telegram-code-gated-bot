@@ -58,8 +58,7 @@ if not BOT_TOKEN or not OWNER_ID or not FORCE_JOIN_CHANNEL: raise SystemExit( "P
 
 bot = Bot(BOT_TOKEN) dp = Dispatcher()
 
-DB_PATH = "bot.db"
-
+DB_PATH = os.getenv("DB_PATH", "/data/bot.db")
 -------------------- Database --------------------
 
 def init_db(): with closing(sqlite3.connect(DB_PATH)) as conn: c = conn.cursor() c.execute( """ CREATE TABLE IF NOT EXISTS users ( user_id INTEGER PRIMARY KEY, first_name TEXT, username TEXT, joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) """ ) c.execute( """ CREATE TABLE IF NOT EXISTS codes ( code TEXT PRIMARY KEY, file_id TEXT NOT NULL, file_type TEXT NOT NULL CHECK(file_type IN ('video','document','audio','photo','animation','voice')), added_by INTEGER NOT NULL, added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) """ ) c.execute( """ CREATE TABLE IF NOT EXISTS allowed_uploaders ( user_id INTEGER PRIMARY KEY ) """ ) conn.commit()
