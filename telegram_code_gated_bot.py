@@ -2,54 +2,56 @@ import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InputFile
+from aiogram.filters import Command
 from aiohttp import web
 
-# -----------------------------
-# Environment Variables
-# -----------------------------
+# ====== CONFIG ======
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-OWNER_ID = int(os.getenv("OWNER_ID", 0))
-BACKUP_CHANNEL = int(os.getenv("BACKUP_CHANNEL", 0))
-AUTH_USER_IDS = list(map(int, os.getenv("AUTH_USER_IDS", "").split(",")))
+OWNER_ID = int(os.getenv("OWNER_ID", 0))  # Owner user ID
+BACKUP_CHANNEL_ID = int(os.getenv("BACKUP_CHANNEL_ID", 0))  # Backup channel ID
 
+# Safe AUTH_USER_IDS parsing
+auth_user_ids_str = os.getenv("AUTH_USER_IDS", "")
+if auth_user_ids_str.strip():
+    AUTH_USER_IDS = list(map(int, auth_user_ids_str.split(",")))
+else:
+    AUTH_USER_IDS = []
+
+# ====== INIT BOT ======
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# -----------------------------
-# Video Upload Handler
-# -----------------------------
-@dp.message_handler(content_types=["video"])
+# ====== HANDLERS ======
+@dp.message(Command("start"))
+async def start_command(message: types.Message):
+    if message.from_user.id in AUTH_USER_IDS or message.from_user.id == OWNER_ID:
+        await message.reply("Welcome! You are authorized.")
+    else:
+        await message.reply("You are not authorized.")
+
+# ====== VIDEO UPLOAD HANDLER ======
+@dp.message(lambda m: m.video)
 async def handle_video(message: types.Message):
-    if message.from_user.id != OWNER_ID:
-        await message.reply("❌ You are not authorized to upload videos.")
+    # Only owner or authorized users can upload
+    if message.from_user.id not in AUTH_USER_IDS and message.from_user.id != OWNER_ID:
+        await message.reply("You are not allowed to upload.")
         return
-    
-    await message.reply("✅ Video received. Processing...")
 
-    # Video temporarily save
-    temp_path = f"temp_{message.video.file_name}"
-    video_file = await message.video.download(destination=temp_path)
+    video = message.video
+    # Forward video to backup channel if configured
+    if BACKUP_CHANNEL_ID:
+        await bot.send_video(BACKUP_CHANNEL_ID, video.file_id, caption=f"Backup from {message.from_user.id}")
 
-    # Send to backup channel
-    await bot.send_video(BACKUP_CHANNEL, InputFile(video_file.name), caption="New video uploaded by owner.")
+    # Auto-delete video after 15 minutes
+    await asyncio.sleep(15*60)
+    try:
+        await message.delete()
+    except:
+        pass  # ignore if already deleted
 
-    # Send to all authorized users
-    for user_id in AUTH_USER_IDS:
-        try:
-            await bot.send_video(user_id, InputFile(video_file.name), caption="Your generated video!")
-        except Exception as e:
-            print(f"Failed to send to {user_id}: {e}")
-
-    # Wait 15 minutes then delete temporary video
-    await asyncio.sleep(900)  # 15 minutes
-    os.remove(video_file.name)
-    await message.reply("🗑️ Temporary video deleted.")
-
-# -----------------------------
-# Dummy Webserver for Render
-# -----------------------------
+# ====== WEB SERVER ======
 async def handle(request):
-    return web.Response(text="Bot is running!")
+    return web.Response(text="Bot is running ✅")
 
 async def start_webserver():
     app = web.Application()
@@ -59,13 +61,11 @@ async def start_webserver():
     site = web.TCPSite(runner, "0.0.0.0", int(os.getenv("PORT", 8080)))
     await site.start()
 
-# -----------------------------
-# Main Function
-# -----------------------------
+# ====== MAIN ======
 async def main():
-    # Start webserver
+    # Start webserver in background
     asyncio.create_task(start_webserver())
-    # Start bot polling
+    # Start bot
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
