@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class FileAccessBot:
     def __init__(self, bot_token: str, owner_id: int, backup_channel_id: str):
-        self.bot_token = 7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA
+        self.bot_token = "7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA"
         self.owner_id = 5045767844
         self.backup_channel_id = -1003099354644  # Channel username or ID (e.g., @mychannel or -1001234567890)
         self.db_path = "file_bot.db"
