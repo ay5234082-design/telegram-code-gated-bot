@@ -9,7 +9,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID", "0"))
 FORCE_JOIN_CHANNEL = os.getenv("FORCE_JOIN_CHANNEL")
 
-bot = Bot(token=BOT_TOKEN) dp = Dispatcher()
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
 
 --- Dummy Web Server for Render ---
 
