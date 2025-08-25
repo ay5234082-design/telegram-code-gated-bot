@@ -1,4 +1,4 @@
-# main.py - Updated for Render.com deployment
+# main.py - Debug version with better error handling
 import os
 import asyncio
 import sqlite3
@@ -13,20 +13,26 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
 from telegram.error import TelegramError
 
-# Configure logging
+# Configure logging with more detail
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
+print("Starting Telegram File Access Bot...")
+logger.info("Bot initialization starting...")
+
 class FileAccessBot:
     def __init__(self, bot_token: str, owner_id: int, backup_channel_id: str):
-        self.bot_token = "7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA"
+        logger.info(f"Initializing bot with owner_id: {owner_id}, channel: {backup_channel_id}")
+        self.bot_token = 7559492905:AAFEtoyWTIB0l83RFw2fZOhp3bU9geVTTpA
         self.owner_id = 5045767844
-        self.backup_channel_id = -1003099354644  # Channel username or ID (e.g., @mychannel or -1001234567890)
+        self.backup_channel_id = -1003099354644
         self.db_path = "file_bot.db"
+        logger.info("Initializing database...")
         self.init_database()
+        logger.info("Database initialized successfully")
         
         # In-memory storage for temporary data
         self.pending_uploads: Dict[int, dict] = {}
@@ -34,54 +40,59 @@ class FileAccessBot:
         
     def init_database(self):
         """Initialize SQLite database"""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Users table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                user_id INTEGER PRIMARY KEY,
-                username TEXT,
-                first_name TEXT,
-                joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Files table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS files (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                access_code TEXT UNIQUE NOT NULL,
-                file_id TEXT NOT NULL,
-                filename TEXT NOT NULL,
-                uploaded_by INTEGER NOT NULL,
-                upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Authorized uploaders table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS authorized_uploaders (
-                user_id INTEGER PRIMARY KEY,
-                authorized_by INTEGER NOT NULL,
-                authorized_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Shared files tracking (for auto-deletion)
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS shared_files (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                message_id INTEGER NOT NULL,
-                chat_id INTEGER NOT NULL,
-                file_id TEXT NOT NULL,
-                shared_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                delete_at TIMESTAMP NOT NULL
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Users table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id INTEGER PRIMARY KEY,
+                    username TEXT,
+                    first_name TEXT,
+                    joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Files table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    access_code TEXT UNIQUE NOT NULL,
+                    file_id TEXT NOT NULL,
+                    filename TEXT NOT NULL,
+                    uploaded_by INTEGER NOT NULL,
+                    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Authorized uploaders table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS authorized_uploaders (
+                    user_id INTEGER PRIMARY KEY,
+                    authorized_by INTEGER NOT NULL,
+                    authorized_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Shared files tracking (for auto-deletion)
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS shared_files (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    message_id INTEGER NOT NULL,
+                    chat_id INTEGER NOT NULL,
+                    file_id TEXT NOT NULL,
+                    shared_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    delete_at TIMESTAMP NOT NULL
+                )
+            ''')
+            
+            conn.commit()
+            conn.close()
+            logger.info("Database tables created successfully")
+        except Exception as e:
+            logger.error(f"Database initialization error: {e}")
+            raise
     
     def generate_access_code(self) -> str:
         """Generate a unique 8-character access code"""
@@ -475,23 +486,13 @@ Need help? Contact the bot owner!
     
     def run(self):
         """Start the bot"""
-        application = Application.builder().token(self.bot_token).build()
-        
-        # Add handlers
-        application.add_handler(CommandHandler("start", self.start_command))
-        application.add_handler(CommandHandler("help", self.help_command))
-        application.add_handler(CommandHandler("upload", self.upload_command))
-        application.add_handler(CommandHandler("check_users", self.check_users_command))
-        application.add_handler(CommandHandler("broadcast", self.broadcast_command))
-        application.add_handler(CommandHandler("authorize", self.authorize_command))
-        application.add_handler(CommandHandler("revoke", self.revoke_command))
-        application.add_handler(CommandHandler("list_files", self.list_files_command))
-        
-        application.add_handler(CallbackQueryHandler(self.check_join_callback, pattern=r"check_join:"))
-        application.add_handler(MessageHandler(filters.Document.ALL, self.handle_file_upload))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
-        
-        logger.info("Bot started successfully!")
-        application.run_polling()
-
-# Configuration from environment vari
+        try:
+            logger.info("Building application...")
+            application = Application.builder().token(self.bot_token).build()
+            
+            # Add handlers
+            logger.info("Adding command handlers...")
+            application.add_handler(CommandHandler("start", self.start_command))
+            application.add_handler(CommandHandler("help", self.help_command))
+            application.add_handler(CommandHandler("upload", self.upload_command))
+            application.add_handler(CommandHandler("check_users", self.check_users_co
