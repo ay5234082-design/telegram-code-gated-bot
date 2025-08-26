@@ -506,3 +506,4 @@ Need help? Contact the bot owner!
             raise
 
     def setup_bot(self):
+    pass  # Placeholder - function does nothing for now
