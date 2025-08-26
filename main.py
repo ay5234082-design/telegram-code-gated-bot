@@ -495,8 +495,14 @@ Need help? Contact the bot owner!
             application.add_handler(CommandHandler("start", self.start_command))
             application.add_handler(CommandHandler("help", self.help_command))
             application.add_handler(CommandHandler("upload", self.upload_command))
-        
-application.add_handler(CommandHandler("check_users", self.check_users_command))
+            application.add_handler(CommandHandler("check_users", self.check_users_command))
+            
+            # Add more handlers and start the application
+            logger.info("Starting bot...")
+            application.run_polling()
+            
+        except Exception as e:
+            logger.error(f"Error starting bot: {e}")
+            raise
 
-def setup_bot(self):
-    ...
+    def setup_bot(self):
